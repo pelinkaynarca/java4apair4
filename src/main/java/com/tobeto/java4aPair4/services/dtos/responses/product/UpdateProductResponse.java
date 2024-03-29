@@ -1,4 +1,4 @@
-package com.tobeto.java4aPair4.services.dtos.product;
+package com.tobeto.java4aPair4.services.dtos.responses.product;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductForUpdatingDto {
+public class UpdateProductResponse {
 	private int categoryId;
 	private int id;
 	private String name;

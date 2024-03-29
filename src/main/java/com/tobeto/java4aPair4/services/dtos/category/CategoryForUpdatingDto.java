@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryForAddingDto {
+public class CategoryForUpdatingDto {
 	private int id;
 	private String name;
 }

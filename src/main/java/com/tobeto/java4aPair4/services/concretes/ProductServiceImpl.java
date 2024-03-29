@@ -2,6 +2,7 @@ package com.tobeto.java4aPair4.services.concretes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -10,9 +11,11 @@ import com.tobeto.java4aPair4.entities.Category;
 import com.tobeto.java4aPair4.repositories.CategoryRepository;
 import com.tobeto.java4aPair4.repositories.ProductRepository;
 import com.tobeto.java4aPair4.services.abstracts.ProductService;
-import com.tobeto.java4aPair4.services.dtos.product.ProductForAddingDto;
-import com.tobeto.java4aPair4.services.dtos.product.ProductForListingDto;
-import com.tobeto.java4aPair4.services.dtos.product.ProductForUpdatingDto;
+import com.tobeto.java4aPair4.services.dtos.requests.product.AddProductRequest;
+import com.tobeto.java4aPair4.services.dtos.requests.product.UpdateProductRequest;
+import com.tobeto.java4aPair4.services.dtos.responses.product.AddProductResponse;
+import com.tobeto.java4aPair4.services.dtos.responses.product.ListProductResponse;
+import com.tobeto.java4aPair4.services.dtos.responses.product.UpdateProductResponse;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -28,30 +31,33 @@ public class ProductServiceImpl implements ProductService {
 	
 
 	@Override
-	public void add(ProductForAddingDto dto) {
-		if(dto.getPrice() <= 0)
-			throw new RuntimeException("Ürün fiyatı 0'dan büyük olmalıdır.");
+	public AddProductResponse add(AddProductRequest request) {
+		productWithSameNameShouldNotExist(request.getName());
 		
 		Product product = new Product();
-		product.setPrice(dto.getPrice());
-		product.setName(dto.getName());
-		Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
+		product.setPrice(request.getPrice());
+		product.setName(request.getName());
+		Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow();
 		product.setCategory(category);
-		productRepository.save(product);
+		Product savedProduct = productRepository.save(product);
+		AddProductResponse response = new AddProductResponse(savedProduct.getId(), category.getId(), savedProduct.getName(), savedProduct.getPrice());
+		return response;
 	}
 
 	@Override
-	public void update(ProductForUpdatingDto dto) {
-		if(dto.getPrice() <= 0)
-			throw new RuntimeException("Ürün fiyatı 0'dan büyük olmalıdır.");
+	public UpdateProductResponse update(UpdateProductRequest request) {
+		productWithSameNameShouldNotExist(request.getName());
 		
 		Product product = new Product();
-		product.setId(dto.getId());
-		product.setPrice(dto.getPrice());
-		product.setName(dto.getName());
-		Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
+		product.setId(request.getId());
+		product.setPrice(request.getPrice());
+		product.setName(request.getName());
+		Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow();
 		product.setCategory(category);
-		productRepository.save(product);
+		Product savedProduct = productRepository.save(product);
+		UpdateProductResponse response = new UpdateProductResponse(savedProduct.getId(), category.getId(), savedProduct.getName(), savedProduct.getPrice());
+		return response;
+		
 	}
 
 	@Override
@@ -61,25 +67,35 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<ProductForListingDto> getAll() {
+	public List<ListProductResponse> getAll() {
 		List<Product> productList = productRepository.findAll();
-		List<ProductForListingDto> productDtoList = new ArrayList<ProductForListingDto>();
+		List<ListProductResponse> productResponseList = new ArrayList<ListProductResponse>();
 		for (Product product : productList) {
-			ProductForListingDto dto = new ProductForListingDto();
-			dto.setName(product.getName());
-			dto.setPrice(product.getPrice());
-			productDtoList.add(dto);
+			ListProductResponse response = new ListProductResponse();
+			response.setId(product.getId());
+			response.setCategoryId(product.getCategory().getId());
+			response.setName(product.getName());
+			response.setPrice(product.getPrice());
+			productResponseList.add(response);
 		}
-		return productDtoList;
+		return productResponseList;
 	}
 
 	@Override
-	public ProductForListingDto getById(int id) {
-		ProductForListingDto dto = new ProductForListingDto();
+	public ListProductResponse getById(int id) {
+		ListProductResponse response = new ListProductResponse();
 		Product product = productRepository.findById(id).orElseThrow();
-		dto.setName(product.getName());
-		dto.setPrice(product.getPrice());
-		return dto;
+		response.setName(product.getName());
+		response.setPrice(product.getPrice());
+		return response;
 	}
+	
+	 private void productWithSameNameShouldNotExist(String productName)
+	    {
+	        Optional<Product> productWithSameName = productRepository.findByNameIgnoreCase(productName);
+
+	        if(productWithSameName.isPresent())
+	            throw new RuntimeException("Aynı isimde bir ürün zaten var.");
+	    }
 	
 }
