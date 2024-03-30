@@ -11,7 +11,6 @@ import com.tobeto.java4aPair4.entities.Product;
 import com.tobeto.java4aPair4.repositories.CategoryRepository;
 import com.tobeto.java4aPair4.services.abstracts.CategoryService;
 import com.tobeto.java4aPair4.services.dtos.requests.category.AddCategoryRequest;
-import com.tobeto.java4aPair4.services.dtos.requests.category.ListCategoryRequest;
 import com.tobeto.java4aPair4.services.dtos.requests.category.UpdateCategoryRequest;
 import com.tobeto.java4aPair4.services.dtos.responses.category.AddCategoryResponse;
 import com.tobeto.java4aPair4.services.dtos.responses.category.ListCategoryResponse;
